@@ -92,9 +92,13 @@ const Navigation = () => {
           </>
         ) : (
           <img 
-            src="/logo.png"
+            src="/symbol.png"
             alt="Tracevizion" 
-            style={{ height: 32 }} 
+            style={{ 
+              height: 32,
+              width: 'auto',
+              margin: '0 auto'
+            }} 
           />
         )}
       </Toolbar>

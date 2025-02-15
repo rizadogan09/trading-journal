@@ -7,6 +7,7 @@ export default defineConfig({
     port: 5174
   },
   define: {
-    'import.meta.env': JSON.stringify(process.env)
+    'import.meta.env': JSON.stringify(process.env),
+    'process.env': process.env
   }
 }) 

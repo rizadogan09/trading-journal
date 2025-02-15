@@ -25,7 +25,6 @@ export const Notifications = () => {
             onClose={handleClose}
             severity={notification.type}
             variant="filled"
-            sx={{ width: '100%' }}
           >
             {notification.message}
           </Alert>

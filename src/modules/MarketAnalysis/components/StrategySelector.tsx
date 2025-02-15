@@ -23,9 +23,11 @@ export const StrategySelector: React.FC<StrategySelectorProps> = ({ advantage })
   const strategies = useSelector((state: RootState) => state.marketAnalysis.strategies);
 
   const getApplicableStrategies = () => {
-    return strategies.filter(strategy => 
-      advantage >= strategy.minAdvantage && advantage <= strategy.maxAdvantage
-    );
+    return strategies.filter(strategy => {
+      const minAdv = strategy.minAdvantage ?? -Infinity;
+      const maxAdv = strategy.maxAdvantage ?? Infinity;
+      return advantage >= minAdv && advantage <= maxAdv;
+    });
   };
 
   const getStrategyColor = (min: number, max: number) => {
@@ -34,6 +36,12 @@ export const StrategySelector: React.FC<StrategySelectorProps> = ({ advantage })
   };
 
   const applicableStrategies = getApplicableStrategies();
+
+  const isStrategyApplicable = (strategy: Strategy, advantage: number) => {
+    const minAdv = strategy.minAdvantage ?? -Infinity;
+    const maxAdv = strategy.maxAdvantage ?? Infinity;
+    return advantage >= minAdv && advantage <= maxAdv;
+  };
 
   return (
     <Box mt={3}>

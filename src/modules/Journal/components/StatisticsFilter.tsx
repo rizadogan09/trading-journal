@@ -25,7 +25,7 @@ interface FilterOptions {
   dateTo: Date | null;
   instrument: string;
   strategy: string;
-  setupQuality: number | '';
+  setupQuality: string;
 }
 
 interface StatisticsFilterProps {

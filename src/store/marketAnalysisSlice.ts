@@ -41,6 +41,12 @@ interface MarketAnalysisState {
   positions: Position[];
 }
 
+// Stelle sicher, dass die Daten im JSON-File den korrekten type haben
+const instrumentsWithCorrectTypes = instrumentsData.instruments.map(inst => ({
+  ...inst,
+  type: inst.type as 'FUTURE' | 'STOCK'
+}));
+
 const initialState: MarketAnalysisState = {
   analyses: [],
   strategies: [
@@ -66,7 +72,7 @@ const initialState: MarketAnalysisState = {
       description: 'Seitwärtsstrategie für neutrale Marktphasen'
     }
   ],
-  instruments: instrumentsData.instruments,
+  instruments: instrumentsWithCorrectTypes,
   selectedInstrument: null,
   positions: []
 };

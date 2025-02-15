@@ -103,7 +103,8 @@ const RiskManager: React.FC = () => {
       rrr: positionSize.rrr,
       status: 'OPEN' as const,
       emotions: selectedEmotions,
-      notes: tradingThoughts
+      notes: tradingThoughts,
+      tags: []
     };
 
     dispatch(addTrade(trade));
@@ -117,6 +118,10 @@ const RiskManager: React.FC = () => {
     setSelectedEmotions([]);
     setTradingThoughts('');
   };
+
+  const instrument = instruments.find(i => i.id === selectedInstrument);
+  const tickSize = instrument?.tickSize ?? 1;
+  const currency = instrument?.currency ?? 'EUR';
 
   return (
     <Box>
@@ -231,16 +236,16 @@ const RiskManager: React.FC = () => {
                   Punkte Risiko: {Math.abs(entryPrice - stopLoss).toFixed(2)}
                 </Typography>
                 <Typography variant="body2">
-                  Ticks at Risk: {Math.abs(entryPrice - stopLoss) / instruments.find(i => i.id === selectedInstrument)?.tickSize}
+                  Ticks at Risk: {Math.abs(entryPrice - stopLoss) / tickSize}
                 </Typography>
                 <Typography variant="body2">
-                  Risiko pro Kontrakt: {(positionSize.totalRisk / positionSize.size).toFixed(2)} {instruments.find(i => i.id === selectedInstrument)?.currency}
+                  Risiko pro Kontrakt: {(positionSize.totalRisk / positionSize.size).toFixed(2)} {currency}
                 </Typography>
                 <Typography variant="body2">
-                  Gesamtrisiko: {positionSize.totalRisk.toFixed(2)} {instruments.find(i => i.id === selectedInstrument)?.currency} ({positionSize.riskPercent}%)
+                  Gesamtrisiko: {positionSize.totalRisk.toFixed(2)} {currency} ({positionSize.riskPercent}%)
                 </Typography>
                 <Typography variant="body2">
-                  Potenzieller Gewinn: {positionSize.potentialProfit.toFixed(2)} {instruments.find(i => i.id === selectedInstrument)?.currency}
+                  Potenzieller Gewinn: {positionSize.potentialProfit.toFixed(2)} {currency}
                 </Typography>
                 <Typography variant="body2" sx={{ 
                   color: positionSize.rrr >= 2 ? 'success.main' : 'warning.main',

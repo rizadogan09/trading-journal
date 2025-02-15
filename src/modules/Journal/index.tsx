@@ -33,6 +33,26 @@ import { exportToExcel, exportToPdf } from '../../utils/exportHelpers';
 import { TradeHistory } from './components/TradeHistory';
 import { LivePerformanceStats } from './components/LivePerformanceStats';
 
+interface Trade {
+  id: string;
+  date: Date;
+  instrumentId: string;
+  direction: 'LONG' | 'SHORT';
+  entryPrice: number;
+  stopLoss: number;
+  targetPrice: number;
+  size: number;
+  riskAmount: number;
+  potentialProfit: number;
+  rrr: number;
+  status: 'OPEN' | 'CLOSED';
+  emotions: string[];
+  notes: string;
+  tags: string[];
+  pnl?: number;  // Optional, da nur bei geschlossenen Trades
+  strategy?: string;  // Optional für die Filterung
+}
+
 const Journal = () => {
   const trades = useSelector((state: RootState) => state.journal.trades);
   const instruments = useSelector((state: RootState) => state.marketAnalysis.instruments);
@@ -117,13 +137,21 @@ const Journal = () => {
   };
 
   const calculateWinRate = (trades: Trade[]) => {
-    const winningTrades = trades.filter(t => t.pnl > 0).length;
+    const winningTrades = trades.filter(t => (t.pnl ?? 0) > 0).length;
     return trades.length > 0 ? (winningTrades / trades.length) * 100 : 0;
   };
 
   const calculateProfitFactor = (trades: Trade[]) => {
-    const profits = trades.filter(t => t.pnl > 0).reduce((sum, t) => sum + t.pnl, 0);
-    const losses = Math.abs(trades.filter(t => t.pnl < 0).reduce((sum, t) => sum + t.pnl, 0));
+    const profits = trades
+      .filter(t => (t.pnl ?? 0) > 0)
+      .reduce((sum, t) => sum + (t.pnl ?? 0), 0);
+    
+    const losses = Math.abs(
+      trades
+        .filter(t => (t.pnl ?? 0) < 0)
+        .reduce((sum, t) => sum + (t.pnl ?? 0), 0)
+    );
+    
     return losses > 0 ? profits / losses : profits > 0 ? Infinity : 0;
   };
 

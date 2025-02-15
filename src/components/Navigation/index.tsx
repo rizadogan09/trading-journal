@@ -80,7 +80,7 @@ const Navigation = () => {
         {isOpen ? (
           <>
             <img 
-              src="/logo.svg"
+              src="/logo.png"
               alt="Tracevizion" 
               style={{ height: 32 }} 
             />
@@ -92,7 +92,7 @@ const Navigation = () => {
           </>
         ) : (
           <img 
-            src="/symbol.png"
+            src="/logo.png"
             alt="Tracevizion" 
             style={{ height: 32 }} 
           />

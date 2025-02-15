@@ -1,8 +1,11 @@
 import { showNotification } from '../store/notificationSlice';
 import { store } from '../store';
 import { mockServer } from './mockWebSocketServer';
+import { updatePosition } from '../store/journalSlice';
 
 type WebSocketCallback = (data: any) => void;
+
+const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8080';
 
 class WebSocketService {
   private socket: WebSocket | null = null;
@@ -11,7 +14,9 @@ class WebSocketService {
   private maxReconnectAttempts = 5;
   private reconnectTimeout = 3000;
 
-  constructor(private url: string) {}
+  constructor() {
+    this.socket = new WebSocket(WS_URL);
+  }
 
   connect() {
     try {
@@ -21,7 +26,7 @@ class WebSocketService {
         mockServer.addClient(this.socket as WebSocket);
       } else {
         // Im Production-Modus echte WebSocket-URL verwenden
-        this.socket = new WebSocket(this.url);
+        this.socket = new WebSocket(WS_URL);
       }
       
       this.socket.onopen = () => {
@@ -81,21 +86,22 @@ class WebSocketService {
   private handleMessage(data: any) {
     const { channel, payload } = data;
     
-    // Benachrichtigungen für neue Trades
-    if (channel === 'trades' && payload.type === 'new') {
-      store.dispatch(showNotification({
-        type: 'info',
-        message: `Neuer Trade: ${payload.instrumentId} ${payload.direction} @ ${payload.price}`
-      }));
-    }
-
-    // Benachrichtigungen für geschlossene Trades
-    if (channel === 'trades' && payload.type === 'closed') {
-      const pnl = payload.pnl;
-      store.dispatch(showNotification({
-        type: pnl >= 0 ? 'success' : 'warning',
-        message: `Trade geschlossen: ${payload.instrumentId} mit ${pnl.toFixed(2)}€ ${pnl >= 0 ? 'Gewinn' : 'Verlust'}`
-      }));
+    // Benachrichtigungen für Trade-Updates
+    if (channel === 'trades') {
+      if (payload.type === 'new') {
+        store.dispatch(showNotification({
+          type: 'info',
+          message: `Neuer Trade: ${payload.instrumentId} ${payload.direction} @ ${payload.price}`
+        }));
+      } else if (payload.type === 'closed') {
+        const pnl = payload.pnl;
+        store.dispatch(showNotification({
+          type: pnl >= 0 ? 'success' : 'warning',
+          message: `Trade geschlossen: ${payload.instrumentId} mit ${pnl.toFixed(2)}€ ${pnl >= 0 ? 'Gewinn' : 'Verlust'}`
+        }));
+        // Aktualisiere die Position im Store
+        store.dispatch(updatePosition(payload));
+      }
     }
 
     // Bestehende Message-Handling-Logik
@@ -113,4 +119,4 @@ class WebSocketService {
   }
 }
 
-export const wsService = new WebSocketService(import.meta.env.VITE_WS_URL); 
+export const wsService = new WebSocketService(); 

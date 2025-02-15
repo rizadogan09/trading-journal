@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Paper,
@@ -34,16 +34,16 @@ interface StatisticsFilterProps {
   strategies: any[];
 }
 
-const StatisticsFilter = ({ onFilterChange, instruments, strategies }: StatisticsFilterProps) => {
-  const [filters, setFilters] = React.useState<FilterOptions>({
-    dateFrom: null,
-    dateTo: null,
+const StatisticsFilter: React.FC<StatisticsFilterProps> = ({ onFilterChange, instruments, strategies }) => {
+  const [filters, setFilters] = useState<FilterOptions>({
+    dateFrom: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+    dateTo: new Date(),
     instrument: '',
     strategy: '',
-    setupQuality: '',
+    setupQuality: ''
   });
 
-  const handleChange = (field: keyof FilterOptions, value: any) => {
+  const handleFilterChange = (field: keyof FilterOptions, value: any) => {
     const newFilters = { ...filters, [field]: value };
     setFilters(newFilters);
     onFilterChange(newFilters);
@@ -71,7 +71,7 @@ const StatisticsFilter = ({ onFilterChange, instruments, strategies }: Statistic
             <DatePicker
               label="Von"
               value={filters.dateFrom}
-              onChange={(date) => handleChange('dateFrom', date)}
+              onChange={(date) => handleFilterChange('dateFrom', date)}
               slotProps={{ textField: { fullWidth: true } }}
             />
           </Grid>
@@ -79,7 +79,7 @@ const StatisticsFilter = ({ onFilterChange, instruments, strategies }: Statistic
             <DatePicker
               label="Bis"
               value={filters.dateTo}
-              onChange={(date) => handleChange('dateTo', date)}
+              onChange={(date) => handleFilterChange('dateTo', date)}
               slotProps={{ textField: { fullWidth: true } }}
             />
           </Grid>
@@ -89,7 +89,7 @@ const StatisticsFilter = ({ onFilterChange, instruments, strategies }: Statistic
               <Select
                 value={filters.instrument}
                 label="Instrument"
-                onChange={(e) => handleChange('instrument', e.target.value)}
+                onChange={(e) => handleFilterChange('instrument', e.target.value)}
               >
                 <MenuItem value="">Alle</MenuItem>
                 {instruments.map((inst) => (
@@ -106,7 +106,7 @@ const StatisticsFilter = ({ onFilterChange, instruments, strategies }: Statistic
               <Select
                 value={filters.strategy}
                 label="Strategie"
-                onChange={(e) => handleChange('strategy', e.target.value)}
+                onChange={(e) => handleFilterChange('strategy', e.target.value)}
               >
                 <MenuItem value="">Alle</MenuItem>
                 {strategies.map((strat) => (
@@ -123,7 +123,7 @@ const StatisticsFilter = ({ onFilterChange, instruments, strategies }: Statistic
               <Select
                 value={filters.setupQuality}
                 label="Setup Qualität"
-                onChange={(e) => handleChange('setupQuality', e.target.value)}
+                onChange={(e) => handleFilterChange('setupQuality', e.target.value)}
               >
                 <MenuItem value="">Alle</MenuItem>
                 {[1, 2, 3, 4, 5].map((rating) => (

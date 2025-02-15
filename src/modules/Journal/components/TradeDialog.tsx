@@ -17,8 +17,9 @@ import {
 } from '@mui/material';
 import { Trade } from '../../../store/journalSlice';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../../store/store';
+import { RootState } from '../../../store';
 import { Sync as SyncIcon } from '@mui/icons-material';
+import instrumentsData from '../../../data/instruments.json';
 
 interface TradeDialogProps {
   open: boolean;
@@ -40,27 +41,29 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, trade, onClose, onSave 
   }, [trade, isConnected]);
 
   const handleChange = (field: keyof Trade, value: any) => {
-    setLocalTrade(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setLocalTrade(prev => {
+      const updatedTrade = { ...prev, [field]: value };
+      
+      if (field === 'status' && value === 'CLOSED') {
+        updatedTrade.exitTime = new Date().toLocaleTimeString('de-DE', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      }
 
-    if (field === 'exitPrice' && value) {
-      const exitPrice = Number(value);
-      const instrument = instruments.find(i => i.id === trade.instrumentId);
-      if (!instrument) return;
+      if (field === 'exitPrice' && updatedTrade.status === 'CLOSED') {
+        const instrument = instruments.find((i: { id: string }) => i.id === trade.instrumentId);
+        if (instrument) {
+          const pnl = updatedTrade.direction === 'LONG'
+            ? (value - updatedTrade.entryPrice) / instrument.tickSize * instrument.tickValue * updatedTrade.size
+            : (updatedTrade.entryPrice - value) / instrument.tickSize * instrument.tickValue * updatedTrade.size;
+          
+          updatedTrade.pnl = Number(pnl.toFixed(2));
+        }
+      }
 
-      const points = Math.abs(exitPrice - localTrade.entryPrice);
-      const ticks = points / instrument.tickSize;
-      const pnl = localTrade.direction === 'LONG'
-        ? ((exitPrice - localTrade.entryPrice) / instrument.tickSize) * instrument.tickValue * localTrade.size
-        : ((localTrade.entryPrice - exitPrice) / instrument.tickSize) * instrument.tickValue * localTrade.size;
-
-      setLocalTrade(prev => ({
-        ...prev,
-        pnl
-      }));
-    }
+      return updatedTrade;
+    });
   };
 
   const handleTagToggle = (tag: string) => {
@@ -70,6 +73,25 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, trade, onClose, onSave 
         ? prev.tags.filter(t => t !== tag)
         : [...prev.tags, tag]
     }));
+  };
+
+  const handleSave = () => {
+    if (localTrade.status === 'CLOSED' && localTrade.exitPrice) {
+      const instrument = instruments.find((i: { id: string }) => i.id === trade.instrumentId);
+      if (instrument) {
+        const pnl = localTrade.direction === 'LONG'
+          ? (localTrade.exitPrice - localTrade.entryPrice) / instrument.tickSize * instrument.tickValue * localTrade.size
+          : (localTrade.entryPrice - localTrade.exitPrice) / instrument.tickSize * instrument.tickValue * localTrade.size;
+
+        setLocalTrade(prev => ({
+          ...prev,
+          pnl: Number(pnl.toFixed(2))
+        }));
+      }
+    }
+    
+    onSave(localTrade);
+    onClose();
   };
 
   return (
@@ -88,28 +110,36 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, trade, onClose, onSave 
       </DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 1 }}>
-          <Grid item xs={12}>
+          <Grid item xs={12} md={6}>
             <FormControl fullWidth>
               <InputLabel>Status</InputLabel>
               <Select
                 value={localTrade.status}
+                label="Status"
                 onChange={(e) => handleChange('status', e.target.value)}
               >
-                <MenuItem value="OPEN">Open</MenuItem>
-                <MenuItem value="CLOSED">Closed</MenuItem>
-                <MenuItem value="CANCELLED">Cancelled</MenuItem>
+                <MenuItem value="OPEN">Offen</MenuItem>
+                <MenuItem value="CLOSED">Geschlossen</MenuItem>
+                <MenuItem value="CANCELLED">Storniert</MenuItem>
               </Select>
             </FormControl>
           </Grid>
           {localTrade.status === 'CLOSED' && (
-            <Grid item xs={12}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label="Exit Price"
+                label="Exit Preis"
                 type="number"
                 value={localTrade.exitPrice || ''}
                 onChange={(e) => handleChange('exitPrice', Number(e.target.value))}
               />
+            </Grid>
+          )}
+          {localTrade.exitTime && (
+            <Grid item xs={12} md={6}>
+              <Typography variant="body2" color="textSecondary">
+                Exit Zeit: {localTrade.exitTime}
+              </Typography>
             </Grid>
           )}
           {localTrade.pnl !== undefined && (
@@ -138,7 +168,7 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, trade, onClose, onSave 
               Trade-Analyse Tags
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {availableTags.map(tag => (
+              {availableTags.map((tag: string) => (
                 <Chip
                   key={tag}
                   label={tag}
@@ -153,7 +183,7 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, trade, onClose, onSave 
       <DialogActions>
         <Button onClick={onClose}>Abbrechen</Button>
         <Button 
-          onClick={() => onSave(localTrade)} 
+          onClick={handleSave} 
           variant="contained"
           color="primary"
         >

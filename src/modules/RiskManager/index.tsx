@@ -61,27 +61,36 @@ const RiskManager: React.FC = () => {
     const instrument = instruments.find(i => i.id === selectedInstrument);
     if (!instrument) return;
 
+    // Risikobetrag in EUR
     const riskAmount = (selectedAccount.balance * riskPercent) / 100;
+    
+    // Punkte zwischen Entry und Stop
     const pointDistance = Math.abs(entryPrice - stopLoss);
+    
+    // Ticks Risiko
     const ticksAtRisk = pointDistance / instrument.tickSize;
-    const totalRiskPerContract = ticksAtRisk * instrument.tickValue;
-    const maxContracts = Math.floor(riskAmount / totalRiskPerContract);
+    
+    // Risiko pro Kontrakt
+    const riskPerContract = ticksAtRisk * instrument.tickValue;
+    
+    // Maximale Kontraktgröße basierend auf Risiko
+    const maxContracts = Math.floor(riskAmount / riskPerContract);
 
-    // Berechnung des potenziellen Gewinns
+    // Ziel-Berechnung
     const targetDistance = Math.abs(entryPrice - targetPrice);
     const ticksToTarget = targetDistance / instrument.tickSize;
     const profitPerContract = ticksToTarget * instrument.tickValue;
-    const totalPotentialProfit = maxContracts * profitPerContract;
+    const potentialProfit = maxContracts * profitPerContract;
 
-    // RRR Berechnung (Risk-Reward-Ratio)
-    const rrr = profitPerContract / totalRiskPerContract;
+    // RRR Berechnung
+    const rrr = profitPerContract / riskPerContract;
 
     setPositionSize({
       size: maxContracts,
-      riskPerPoint: totalRiskPerContract / pointDistance,
-      totalRisk: maxContracts * totalRiskPerContract,
+      riskPerPoint: riskPerContract / pointDistance,
+      totalRisk: maxContracts * riskPerContract,
       riskPercent,
-      potentialProfit: totalPotentialProfit,
+      potentialProfit,
       rrr
     });
   };
@@ -89,9 +98,16 @@ const RiskManager: React.FC = () => {
   const handleCreateTrade = () => {
     if (!selectedAccount || !direction || !selectedInstrument || !positionSize) return;
 
+    const instrument = instruments.find(i => i.id === selectedInstrument);
+    if (!instrument) return;
+
     const trade = {
       id: Date.now().toString(),
       date: new Date(),
+      entryTime: new Date().toLocaleTimeString('de-DE', {
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
       instrumentId: selectedInstrument,
       direction: direction as 'LONG' | 'SHORT',
       entryPrice,

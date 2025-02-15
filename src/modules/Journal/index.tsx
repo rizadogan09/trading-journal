@@ -32,6 +32,10 @@ import { de } from 'date-fns/locale';
 import { exportToExcel, exportToPdf } from '../../utils/exportHelpers';
 import { TradeHistory } from './components/TradeHistory';
 import { LivePerformanceStats } from './components/LivePerformanceStats';
+import TradingTimeAnalysis from './components/TradingTimeAnalysis';
+
+// Status-Type erweitern
+type TradeStatus = 'OPEN' | 'CLOSED' | 'CANCELLED';
 
 interface Trade {
   id: string;
@@ -45,12 +49,16 @@ interface Trade {
   riskAmount: number;
   potentialProfit: number;
   rrr: number;
-  status: 'OPEN' | 'CLOSED';
+  status: TradeStatus;
   emotions: string[];
   notes: string;
   tags: string[];
-  pnl?: number;  // Optional, da nur bei geschlossenen Trades
-  strategy?: string;  // Optional für die Filterung
+  pnl?: number;
+  strategy?: string;
+  tradeNumber: number;
+  exitPrice?: number;
+  entryTime?: string;
+  exitTime?: string;
 }
 
 const Journal = () => {
@@ -209,6 +217,10 @@ const Journal = () => {
           </Grid>
 
           <Grid item xs={12}>
+            <TradingTimeAnalysis trades={filteredTrades} />
+          </Grid>
+
+          <Grid item xs={12}>
             <Paper sx={{ p: 3 }}>
               <Typography variant="h6" gutterBottom>
                 Trade Details
@@ -220,6 +232,8 @@ const Journal = () => {
                     <TableRow>
                       <TableCell>Nr.</TableCell>
                       <TableCell>Datum</TableCell>
+                      <TableCell>Entry Zeit</TableCell>
+                      <TableCell>Exit Zeit</TableCell>
                       <TableCell>Instrument</TableCell>
                       <TableCell>Richtung</TableCell>
                       <TableCell>Größe</TableCell>
@@ -241,9 +255,9 @@ const Journal = () => {
                       .map((trade) => (
                         <TableRow key={trade.id}>
                           <TableCell>{trade.tradeNumber}</TableCell>
-                          <TableCell>
-                            {new Date(trade.date).toLocaleDateString()}
-                          </TableCell>
+                          <TableCell>{new Date(trade.date).toLocaleDateString()}</TableCell>
+                          <TableCell>{trade.entryTime || '-'}</TableCell>
+                          <TableCell>{trade.exitTime || '-'}</TableCell>
                           <TableCell>{getInstrumentName(trade.instrumentId)}</TableCell>
                           <TableCell>
                             <Chip 

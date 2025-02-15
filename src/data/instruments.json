@@ -1,0 +1,211 @@
+{
+  "instruments": [
+    {
+      "id": "ES",
+      "name": "E-mini S&P 500",
+      "type": "FUTURE",
+      "tickSize": 0.25,
+      "tickValue": 12.50,
+      "currency": "USD"
+    },
+    {
+      "id": "MES",
+      "name": "Micro E-mini S&P 500",
+      "type": "FUTURE",
+      "tickSize": 0.25,
+      "tickValue": 1.25,
+      "currency": "USD"
+    },
+    {
+      "id": "NQ",
+      "name": "E-mini NASDAQ",
+      "type": "FUTURE",
+      "tickSize": 0.25,
+      "tickValue": 5.00,
+      "currency": "USD"
+    },
+    {
+      "id": "MNQ",
+      "name": "Micro E-mini NASDAQ",
+      "type": "FUTURE",
+      "tickSize": 0.25,
+      "tickValue": 0.50,
+      "currency": "USD"
+    },
+    {
+      "id": "YM",
+      "name": "E-mini Dow",
+      "type": "FUTURE",
+      "tickSize": 1.00,
+      "tickValue": 5.00,
+      "currency": "USD"
+    },
+    {
+      "id": "RTY",
+      "name": "E-mini Russell 2000",
+      "type": "FUTURE",
+      "tickSize": 0.10,
+      "tickValue": 10.00,
+      "currency": "USD"
+    },
+    {
+      "id": "FDAX",
+      "name": "DAX Future",
+      "type": "FUTURE",
+      "tickSize": 0.5,
+      "tickValue": 25.00,
+      "currency": "EUR"
+    },
+    {
+      "id": "FDXM",
+      "name": "Mini-DAX Future",
+      "type": "FUTURE",
+      "tickSize": 0.5,
+      "tickValue": 5.00,
+      "currency": "EUR"
+    },
+    {
+      "id": "FGBL",
+      "name": "Euro-Bund Future",
+      "type": "FUTURE",
+      "tickSize": 0.01,
+      "tickValue": 10.00,
+      "currency": "EUR"
+    },
+    {
+      "id": "FESX",
+      "name": "EURO STOXX 50",
+      "type": "FUTURE",
+      "tickSize": 1,
+      "tickValue": 10.00,
+      "currency": "EUR"
+    },
+    {
+      "id": "CL",
+      "name": "Crude Oil",
+      "type": "FUTURE",
+      "tickSize": 0.01,
+      "tickValue": 10.00,
+      "currency": "USD"
+    },
+    {
+      "id": "GC",
+      "name": "Gold",
+      "type": "FUTURE",
+      "tickSize": 0.10,
+      "tickValue": 10.00,
+      "currency": "USD"
+    },
+    {
+      "id": "SI",
+      "name": "Silver",
+      "type": "FUTURE",
+      "tickSize": 0.005,
+      "tickValue": 25.00,
+      "currency": "USD"
+    },
+    {
+      "id": "6E",
+      "name": "Euro FX",
+      "type": "FUTURE",
+      "tickSize": 0.0001,
+      "tickValue": 12.50,
+      "currency": "USD"
+    },
+    {
+      "id": "6B",
+      "name": "British Pound",
+      "type": "FUTURE",
+      "tickSize": 0.0001,
+      "tickValue": 6.25,
+      "currency": "USD"
+    },
+    {
+      "id": "6J",
+      "name": "Japanese Yen",
+      "type": "FUTURE",
+      "tickSize": 0.0000005,
+      "tickValue": 6.25,
+      "currency": "USD"
+    },
+    {
+      "id": "ZB",
+      "name": "30Y T-Bond",
+      "type": "FUTURE",
+      "tickSize": 0.03125,
+      "tickValue": 31.25,
+      "currency": "USD"
+    },
+    {
+      "id": "ZN",
+      "name": "10Y T-Note",
+      "type": "FUTURE",
+      "tickSize": 0.015625,
+      "tickValue": 15.625,
+      "currency": "USD"
+    },
+    {
+      "id": "AAPL",
+      "name": "Apple Inc.",
+      "type": "STOCK",
+      "tickSize": 0.01,
+      "tickValue": 0.01,
+      "currency": "USD",
+      "exchange": "NASDAQ"
+    },
+    {
+      "id": "MSFT",
+      "name": "Microsoft Corporation",
+      "type": "STOCK",
+      "tickSize": 0.01,
+      "tickValue": 0.01,
+      "currency": "USD",
+      "exchange": "NASDAQ"
+    },
+    {
+      "id": "GOOGL",
+      "name": "Alphabet Inc.",
+      "type": "STOCK",
+      "tickSize": 0.01,
+      "tickValue": 0.01,
+      "currency": "USD",
+      "exchange": "NASDAQ"
+    },
+    {
+      "id": "AMZN",
+      "name": "Amazon.com Inc.",
+      "type": "STOCK",
+      "tickSize": 0.01,
+      "tickValue": 0.01,
+      "currency": "USD",
+      "exchange": "NASDAQ"
+    },
+    {
+      "id": "META",
+      "name": "Meta Platforms Inc.",
+      "type": "STOCK",
+      "tickSize": 0.01,
+      "tickValue": 0.01,
+      "currency": "USD",
+      "exchange": "NASDAQ"
+    },
+    {
+      "id": "SAP.DE",
+      "name": "SAP SE",
+      "type": "STOCK",
+      "tickSize": 0.01,
+      "tickValue": 0.01,
+      "currency": "EUR",
+      "exchange": "XETRA"
+    },
+    {
+      "id": "SIE.DE",
+      "name": "Siemens AG",
+      "type": "STOCK",
+      "tickSize": 0.01,
+      "tickValue": 0.01,
+      "currency": "EUR",
+      "exchange": "XETRA"
+    }
+  ]
+} 

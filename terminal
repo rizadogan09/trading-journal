@@ -1,0 +1,652 @@
+# Alles löschen und neu anfangen
+cd ..
+sudo rm -rf trading-journal
+clear
+
+# Zuerst Vite global installieren
+npm install -g vite
+
+# Neues Projekt erstellen
+npm create vite@latest trading-journal -- --template react-ts
+
+# Ins Verzeichnis wechseln und Dependencies installieren
+cd trading-journal
+npm install
+
+# MUI und andere Dependencies installieren
+npm install @mui/material @mui/icons-material @emotion/react @emotion/styled @reduxjs/toolkit react-redux react-router-dom
+
+# Starten
+npm run dev
+
+# Stoppen Sie zuerst alle laufenden Node-Prozesse mit Ctrl+C
+
+# Überprüfen Sie das aktuelle Verzeichnis
+pwd
+
+# Stellen Sie sicher, dass wir im richtigen Verzeichnis sind
+cd trading-journal
+
+# Überprüfen Sie den Inhalt des Verzeichnisses
+ls
+
+# Überprüfen Sie den Inhalt des src-Verzeichnisses
+ls src
+
+# Überprüfen Sie den Inhalt von src/App.tsx
+cat src/App.tsx
+
+# Vite config aktualisieren
+cat > vite.config.ts << 'EOL'
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: 5174
+  }
+})
+EOL
+
+# Server stoppen (Ctrl+C) und neu starten
+npm run dev
+
+mkdir -p src/components/Navigation
+
+touch src/theme.ts src/components/Navigation/index.tsx
+
+mkdir -p src/store
+touch src/store/index.ts
+
+mkdir -p src/modules/{MarketAnalysis,RiskManager,Journal,Settings,Instruments}
+
+echo "PORT=5174
+REACT_APP_NAME=\"Trading Journal\"" > .env
+
+echo "VITE_TRADINGVIEW_API_KEY=your_api_key_here" >> .env
+
+cat > src/App.tsx << 'EOL'
+import { ThemeProvider, CssBaseline, Box, Toolbar } from '@mui/material';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navigation from './components/Navigation';
+import MarketAnalysis from './modules/MarketAnalysis';
+import RiskManager from './modules/RiskManager';
+import Journal from './modules/Journal';
+import Settings from './modules/Settings';
+import Instruments from './modules/Instruments';
+import theme from './theme';
+
+function App() {
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Router>
+        <Box sx={{ display: 'flex' }}>
+          <Navigation />
+          <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+            <Toolbar />
+            <Routes>
+              <Route path="/" element={<MarketAnalysis />} />
+              <Route path="/risk-manager" element={<RiskManager />} />
+              <Route path="/journal" element={<Journal />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/instruments" element={<Instruments />} />
+            </Routes>
+          </Box>
+        </Box>
+      </Router>
+    </ThemeProvider>
+  );
+}
+
+export default App;
+EOL
+
+# RiskManager
+cat > src/modules/RiskManager/index.tsx << 'EOL'
+import React from 'react';
+import { Box, Typography, Paper, Grid } from '@mui/material';
+
+const RiskManager = () => {
+  return (
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4" gutterBottom>
+        Risikomanager
+      </Typography>
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 2 }}>
+            <Typography variant="h6">Position Sizing</Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 2 }}>
+            <Typography variant="h6">Risiko Kalkulator</Typography>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+};
+
+export default RiskManager;
+EOL
+
+# Journal
+cat > src/modules/Journal/index.tsx << 'EOL'
+import React from 'react';
+import { Box, Typography, Paper, Grid } from '@mui/material';
+
+const Journal = () => {
+  return (
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4" gutterBottom>
+        Trading Journal
+      </Typography>
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Paper sx={{ p: 2 }}>
+            <Typography variant="h6">Trades</Typography>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+};
+
+export default Journal;
+EOL
+
+# Settings
+cat > src/modules/Settings/index.tsx << 'EOL'
+import React from 'react';
+import { Box, Typography, Paper, Grid } from '@mui/material';
+
+const Settings = () => {
+  return (
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4" gutterBottom>
+        Einstellungen
+      </Typography>
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 2 }}>
+            <Typography variant="h6">Allgemein</Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 2 }}>
+            <Typography variant="h6">Profil</Typography>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+};
+
+export default Settings;
+EOL
+
+# Instruments
+cat > src/modules/Instruments/index.tsx << 'EOL'
+import React from 'react';
+import { Box, Typography, Paper, Grid } from '@mui/material';
+
+const Instruments = () => {
+  return (
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4" gutterBottom>
+        Instrumente
+      </Typography>
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Paper sx={{ p: 2 }}>
+            <Typography variant="h6">Verfügbare Instrumente</Typography>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+};
+
+export default Instruments;
+EOL
+
+# Store-Dateien erstellen
+cat > src/store/marketAnalysisSlice.ts << 'EOL'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+interface Strategy {
+  id: string;
+  name: string;
+  minAdvantage: number;
+  maxAdvantage: number;
+  description: string;
+}
+
+interface Instrument {
+  id: string;
+  name: string;
+  type: 'FUTURE' | 'STOCK';
+}
+
+interface Analysis {
+  id: string;
+  date: Date;
+  instrumentId: string;
+  timeLevels: {
+    [key: string]: string;
+  };
+  advantage: number;
+}
+
+interface MarketAnalysisState {
+  analyses: Analysis[];
+  strategies: Strategy[];
+  instruments: Instrument[];
+}
+
+const initialState: MarketAnalysisState = {
+  analyses: [],
+  strategies: [
+    {
+      id: 'flow-short',
+      name: 'Flow Trading Short',
+      minAdvantage: -100,
+      maxAdvantage: -33,
+      description: 'Trendfolgestrategie für starke Abwärtsbewegungen'
+    },
+    {
+      id: 'flow-long',
+      name: 'Flow Trading Long',
+      minAdvantage: 33,
+      maxAdvantage: 100,
+      description: 'Trendfolgestrategie für starke Aufwärtsbewegungen'
+    },
+    {
+      id: 'range',
+      name: 'Range Trading',
+      minAdvantage: -32,
+      maxAdvantage: 32,
+      description: 'Seitwärtsstrategie für neutrale Marktphasen'
+    }
+  ],
+  instruments: [
+    {
+      id: 'FDAX',
+      name: 'DAX Future',
+      type: 'FUTURE'
+    },
+    {
+      id: 'ES',
+      name: 'E-mini S&P 500',
+      type: 'FUTURE'
+    },
+    {
+      id: 'NQ',
+      name: 'E-mini NASDAQ',
+      type: 'FUTURE'
+    }
+  ]
+};
+
+const marketAnalysisSlice = createSlice({
+  name: 'marketAnalysis',
+  initialState,
+  reducers: {
+    addAnalysis(state, action: PayloadAction<Analysis>) {
+      state.analyses.push(action.payload);
+    },
+    updateAnalysis(state, action: PayloadAction<Analysis>) {
+      const index = state.analyses.findIndex(a => a.id === action.payload.id);
+      if (index !== -1) {
+        state.analyses[index] = action.payload;
+      }
+    },
+    deleteAnalysis(state, action: PayloadAction<string>) {
+      state.analyses = state.analyses.filter(a => a.id !== action.payload);
+    }
+  }
+});
+
+export const { addAnalysis, updateAnalysis, deleteAnalysis } = marketAnalysisSlice.actions;
+export default marketAnalysisSlice.reducer;
+EOL
+
+# Root store aktualisieren
+cat > src/store/index.ts << 'EOL'
+import { configureStore } from '@reduxjs/toolkit';
+import marketAnalysisReducer from './marketAnalysisSlice';
+
+const store = configureStore({
+  reducer: {
+    marketAnalysis: marketAnalysisReducer
+  }
+});
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+
+export { store };
+EOL
+
+# MarketAnalysis-Komponenten erstellen
+mkdir -p src/modules/MarketAnalysis/components
+
+# AdvantageMeter erstellen
+cat > src/modules/MarketAnalysis/components/AdvantageMeter.tsx << 'EOL'
+import React from 'react';
+import { Box, Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
+
+interface AdvantageMeterProps {
+  advantage: number;
+}
+
+const MeterContainer = styled(Box)(({ theme }) => ({
+  position: 'relative',
+  width: '100%',
+  height: 60,
+  backgroundColor: theme.palette.grey[800],
+  borderRadius: 30,
+  overflow: 'hidden',
+  marginTop: theme.spacing(2),
+  marginBottom: theme.spacing(2)
+}));
+
+const MeterFill = styled(Box)<{ advantage: number }>(({ theme, advantage }) => ({
+  position: 'absolute',
+  height: '100%',
+  width: `${Math.abs(advantage)}%`,
+  left: advantage < 0 ? 'auto' : '50%',
+  right: advantage < 0 ? '50%' : 'auto',
+  backgroundColor: advantage > 0 
+    ? theme.palette.success.main 
+    : advantage < 0 
+      ? theme.palette.error.main 
+      : theme.palette.warning.main,
+  transition: 'all 0.3s ease'
+}));
+
+const CenterLine = styled(Box)(({ theme }) => ({
+  position: 'absolute',
+  left: '50%',
+  height: '100%',
+  width: 2,
+  backgroundColor: theme.palette.grey[600],
+  transform: 'translateX(-50%)'
+}));
+
+export const AdvantageMeter: React.FC<AdvantageMeterProps> = ({ advantage }) => {
+  return (
+    <Box>
+      <Typography 
+        variant="h3" 
+        align="center" 
+        color={advantage > 0 ? 'success.main' : advantage < 0 ? 'error.main' : 'warning.main'}
+        sx={{ mb: 2 }}
+      >
+        {advantage}%
+      </Typography>
+      <MeterContainer>
+        <CenterLine />
+        <MeterFill advantage={advantage} />
+      </MeterContainer>
+      <Box 
+        display="flex" 
+        justifyContent="space-between" 
+        mt={1}
+        sx={{ color: 'text.secondary' }}
+      >
+        <Typography>Short 100%</Typography>
+        <Typography>Neutral</Typography>
+        <Typography>Long 100%</Typography>
+      </Box>
+    </Box>
+  );
+};
+EOL
+
+# StrategySelector erstellen
+cat > src/modules/MarketAnalysis/components/StrategySelector.tsx << 'EOL'
+import React from 'react';
+import {
+  Box,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  Chip,
+  Divider,
+  useTheme
+} from '@mui/material';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store';
+
+interface StrategySelectorProps {
+  advantage: number;
+}
+
+export const StrategySelector: React.FC<StrategySelectorProps> = ({ advantage }) => {
+  const theme = useTheme();
+  const strategies = useSelector((state: RootState) => state.marketAnalysis.strategies);
+
+  const getApplicableStrategies = () => {
+    return strategies.filter(strategy => 
+      advantage >= strategy.minAdvantage && advantage <= strategy.maxAdvantage
+    );
+  };
+
+  const getStrategyColor = (min: number, max: number) => {
+    if (min >= 33 || max <= -33) return theme.palette.success.main;
+    return theme.palette.warning.main;
+  };
+
+  const applicableStrategies = getApplicableStrategies();
+
+  return (
+    <Box mt={3}>
+      <Typography variant="h6" gutterBottom>
+        Handelbare Strategien
+      </Typography>
+      {applicableStrategies.length > 0 ? (
+        <List>
+          {applicableStrategies.map((strategy) => (
+            <React.Fragment key={strategy.id}>
+              <ListItem>
+                <ListItemText
+                  primary={
+                    <Box display="flex" alignItems="center" gap={1}>
+                      {strategy.name}
+                      <Chip
+                        size="small"
+                        label={`${strategy.minAdvantage}% bis ${strategy.maxAdvantage}%`}
+                        sx={{
+                          backgroundColor: getStrategyColor(strategy.minAdvantage, strategy.maxAdvantage),
+                          color: 'white'
+                        }}
+                      />
+                    </Box>
+                  }
+                  secondary={strategy.description}
+                />
+              </ListItem>
+              <Divider />
+            </React.Fragment>
+          ))}
+        </List>
+      ) : (
+        <Typography 
+          color="text.secondary" 
+          align="center"
+          sx={{ 
+            py: 4,
+            backgroundColor: theme.palette.grey[900],
+            borderRadius: 1
+          }}
+        >
+          Keine Strategien für diesen Marktvorteil verfügbar
+        </Typography>
+      )}
+    </Box>
+  );
+};
+EOL
+
+# MarketAnalysis-Hauptkomponente erstellen
+cat > src/modules/MarketAnalysis/index.tsx << 'EOL'
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Paper,
+  Typography,
+  Grid,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Button,
+  TextField
+} from '@mui/material';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../../store';
+import { addAnalysis } from '../../store/marketAnalysisSlice';
+import { AdvantageMeter } from './components/AdvantageMeter';
+import { StrategySelector } from './components/StrategySelector';
+
+const TIME_LEVEL_WEIGHTS = {
+  '240': 0.2, // 4H
+  '60': 0.7,  // 1H
+  '15': 0.1   // 15min
+};
+
+const DIRECTION_VALUES = {
+  '↑': 1,    // Strong Up
+  '↗': 0.5,  // Slight Up
+  '→': 0,    // Neutral
+  '↘': -0.5, // Slight Down
+  '↓': -1    // Strong Down
+};
+
+const MarketAnalysis = () => {
+  const dispatch = useDispatch();
+  const instruments = useSelector((state: RootState) => state.marketAnalysis.instruments);
+  
+  const [selectedInstrument, setSelectedInstrument] = useState('');
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [timeLevelDirections, setTimeLevelDirections] = useState({
+    '240': '→',
+    '60': '→',
+    '15': '→'
+  });
+  const [advantage, setAdvantage] = useState(0);
+
+  useEffect(() => {
+    calculateAdvantage();
+  }, [timeLevelDirections]);
+
+  const calculateAdvantage = () => {
+    let total = 0;
+    Object.entries(timeLevelDirections).forEach(([timeLevel, direction]) => {
+      total += TIME_LEVEL_WEIGHTS[timeLevel as keyof typeof TIME_LEVEL_WEIGHTS] * 
+               DIRECTION_VALUES[direction as keyof typeof DIRECTION_VALUES];
+    });
+    const advantagePercent = Math.round(total * 100);
+    setAdvantage(advantagePercent);
+  };
+
+  return (
+    <Grid container spacing={3}>
+      <Grid item xs={12} md={6}>
+        <Paper sx={{ p: 2 }}>
+          <Typography variant="h6" gutterBottom>Marktanalyse</Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel>Instrument</InputLabel>
+                <Select
+                  value={selectedInstrument}
+                  onChange={(e) => setSelectedInstrument(e.target.value)}
+                >
+                  {instruments.map((instrument) => (
+                    <MenuItem key={instrument.id} value={instrument.id}>
+                      {instrument.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            
+            <Grid item xs={12}>
+              <TextField
+                type="date"
+                fullWidth
+                label="Datum"
+                value={selectedDate.toISOString().split('T')[0]}
+                onChange={(e) => setSelectedDate(new Date(e.target.value))}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+
+            {Object.entries(TIME_LEVEL_WEIGHTS).map(([timeLevel, weight]) => (
+              <Grid item xs={12} key={timeLevel}>
+                <FormControl fullWidth>
+                  <InputLabel>{`${timeLevel}min (${weight * 100}%)`}</InputLabel>
+                  <Select
+                    value={timeLevelDirections[timeLevel as keyof typeof TIME_LEVEL_WEIGHTS]}
+                    onChange={(e) => setTimeLevelDirections({
+                      ...timeLevelDirections,
+                      [timeLevel]: e.target.value
+                    })}
+                  >
+                    {Object.keys(DIRECTION_VALUES).map((direction) => (
+                      <MenuItem key={direction} value={direction}>
+                        {direction}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            ))}
+          </Grid>
+        </Paper>
+      </Grid>
+
+      <Grid item xs={12} md={6}>
+        <Paper sx={{ p: 2 }}>
+          <Typography variant="h6" gutterBottom>Marktvorteil</Typography>
+          <AdvantageMeter advantage={advantage} />
+          <StrategySelector advantage={advantage} />
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            onClick={() => {
+              if (selectedInstrument) {
+                dispatch(addAnalysis({
+                  id: Date.now().toString(),
+                  date: selectedDate,
+                  instrumentId: selectedInstrument,
+                  timeLevels: timeLevelDirections,
+                  advantage
+                }));
+              }
+            }}
+            sx={{ mt: 2 }}
+          >
+            Analyse speichern
+          </Button>
+        </Paper>
+      </Grid>
+    </Grid>
+  );
+};
+
+export default MarketAnalysis;
+EOL
+
+# Verzeichnis umbenennen
+cd ..
+mv trading-journal Tracevizion-Trading-Journal
+cd Tracevizion-Trading-Journal

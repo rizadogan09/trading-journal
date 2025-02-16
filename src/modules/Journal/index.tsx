@@ -18,7 +18,7 @@ import {
   Stack
 } from '@mui/material';
 import { RootState } from '../../store';
-import { Trade as JournalTrade } from '../../store/journalSlice';
+import { Trade } from '../../store/journalSlice';
 import { updateTrade } from '../../store/journalSlice';
 import TradeDialog from './components/TradeDialog';
 import { Edit as EditIcon } from '@mui/icons-material';
@@ -34,33 +34,6 @@ import { TradeHistory } from './components/TradeHistory';
 import { LivePerformanceStats } from './components/LivePerformanceStats';
 import TradingTimeAnalysis from './components/TradingTimeAnalysis';
 import { Position } from '../../types/position';
-
-// Status-Type erweitern
-type TradeStatus = 'OPEN' | 'CLOSED' | 'CANCELLED';
-
-interface Trade {
-  id: string;
-  date: Date;
-  instrumentId: string;
-  direction: 'LONG' | 'SHORT';
-  entryPrice: number;
-  stopLoss: number;
-  targetPrice: number;
-  size: number;
-  riskAmount: number;
-  potentialProfit: number;
-  rrr: number;
-  status: TradeStatus;
-  emotions: string[];
-  notes: string;
-  tags: string[];
-  pnl?: number;
-  strategy?: string;
-  tradeNumber: number;
-  exitPrice?: number;
-  entryTime?: string;
-  exitTime?: string;
-}
 
 const Journal = () => {
   const trades = useSelector((state: RootState) => state.journal.trades);
@@ -180,7 +153,7 @@ const Journal = () => {
     );
   });
 
-  const handleEditTrade = (trade: JournalTrade) => {
+  const handleEditTrade = (trade: Trade) => {
     setSelectedTrade(trade);
   };
 

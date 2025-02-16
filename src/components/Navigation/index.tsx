@@ -81,12 +81,17 @@ const Navigation = () => {
           <>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <img 
-                src="/logo.png"
+                src="https://trading-journal-six.vercel.app/logo.png"
                 alt="Tracevizion Logo" 
                 style={{ 
                   height: '40px', 
-                  marginRight: '1rem' 
+                  marginRight: '1rem',
+                  objectFit: 'contain'
                 }} 
+                onError={(e) => {
+                  console.error('Logo loading error:', e);
+                  e.currentTarget.style.display = 'none';
+                }}
               />
               {!isMobile && (
                 <IconButton onClick={() => setIsOpen(false)}>
@@ -97,13 +102,18 @@ const Navigation = () => {
           </>
         ) : (
           <img 
-            src="/symbol.png"
+            src="https://trading-journal-six.vercel.app/symbol.png"
             alt="Tracevizion" 
             style={{ 
               height: 32,
               width: 'auto',
-              margin: '0 auto'
-            }} 
+              margin: '0 auto',
+              objectFit: 'contain'
+            }}
+            onError={(e) => {
+              console.error('Symbol loading error:', e);
+              e.currentTarget.style.display = 'none';
+            }}
           />
         )}
       </Toolbar>

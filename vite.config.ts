@@ -11,8 +11,8 @@ export default defineConfig({
     'process.env': process.env
   },
   build: {
-    sourcemap: true,
     outDir: 'dist',
+    sourcemap: true,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -20,5 +20,6 @@ export default defineConfig({
         }
       }
     }
-  }
+  },
+  base: './'
 }) 

@@ -79,16 +79,21 @@ const Navigation = () => {
       }}>
         {isOpen ? (
           <>
-            <img 
-              src="/logo.png"
-              alt="Tracevizion" 
-              style={{ height: 32 }} 
-            />
-            {!isMobile && (
-              <IconButton onClick={() => setIsOpen(false)}>
-                <ChevronLeftIcon />
-              </IconButton>
-            )}
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <img 
+                src="/logo.png"
+                alt="Tracevizion Logo" 
+                style={{ 
+                  height: '40px', 
+                  marginRight: '1rem' 
+                }} 
+              />
+              {!isMobile && (
+                <IconButton onClick={() => setIsOpen(false)}>
+                  <ChevronLeftIcon />
+                </IconButton>
+              )}
+            </Box>
           </>
         ) : (
           <img 

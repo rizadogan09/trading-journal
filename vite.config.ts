@@ -13,13 +13,19 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    chunkSizeWarningLimit: 1000,
+    copyPublicDir: true,
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', '@mui/material']
+          'vendor-mui': ['@mui/material', '@mui/icons-material'],
+          'vendor-charts': ['recharts'],
+          'vendor-core': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-utils': ['date-fns', 'jspdf', 'xlsx']
         }
       }
     }
   },
+  publicDir: 'public',
   base: './'
 }) 

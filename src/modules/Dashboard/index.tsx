@@ -13,7 +13,7 @@ import { wsService } from '../../services/websocketService';
 import { updatePosition } from '../../store/journalSlice';
 import PerformanceChart from './components/PerformanceChart';
 import { LivePerformanceStats } from './components/LivePerformanceStats';
-import { OpenPositions } from './components/OpenPositions';
+import OpenPositions from './components/OpenPositions';
 
 const StatCard = ({ title, value, icon, trend, color }: any) => (
   <Paper sx={{ 

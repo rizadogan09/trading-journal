@@ -1,75 +1,50 @@
 import React from 'react';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableRow,
-  Chip,
-  Typography,
-  Box
-} from '@mui/material';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { LivePriceIndicator } from '../../../components/LivePriceIndicator';
-import { PositionStatusIndicator } from '../../../components/PositionStatusIndicator';
-
-interface Position {
-  id: string;
-  instrumentId: string;
-  entryPrice: number;
-  currentPrice: number;
-  direction: 'LONG' | 'SHORT';
-  size: number;
-  pnl: number;
-  pnlPercent: number;
-}
+import { Box, Typography, Chip } from '@mui/material';
 
 const OpenPositions = () => {
-  const positions = useSelector((state: RootState) => state.marketAnalysis.positions);
+  const trades = useSelector((state: RootState) => state.journal.trades);
   const instruments = useSelector((state: RootState) => state.marketAnalysis.instruments);
 
+  const openTrades = trades.filter(t => t.status === 'OPEN');
+
+  const getInstrumentName = (id: string) => {
+    return instruments.find(i => i.id === id)?.name || id;
+  };
+
   return (
-    <Table size="small">
-      <TableHead>
-        <TableRow>
-          <TableCell>Instrument</TableCell>
-          <TableCell>Richtung</TableCell>
-          <TableCell align="right">Entry</TableCell>
-          <TableCell align="right">Aktuell</TableCell>
-          <TableCell align="right">P/L</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {positions.map((position) => (
-          <TableRow key={position.id}>
-            <TableCell>{position.instrumentId}</TableCell>
-            <TableCell>
+    <Box>
+      {openTrades.length === 0 ? (
+        <Typography color="text.secondary">Keine offenen Positionen</Typography>
+      ) : (
+        openTrades.map(trade => (
+          <Box key={trade.id} sx={{ mb: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="subtitle1">
+                {getInstrumentName(trade.instrumentId)}
+              </Typography>
               <Chip 
-                label={position.direction}
-                color={position.direction === 'LONG' ? 'success' : 'error'}
+                label={trade.direction}
+                color={trade.direction === 'LONG' ? 'success' : 'error'}
                 size="small"
               />
-            </TableCell>
-            <TableCell align="right">{position.entryPrice}</TableCell>
-            <TableCell align="right">
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Typography>{position.currentPrice}</Typography>
-                <LivePriceIndicator instrumentId={position.instrumentId} />
-                <PositionStatusIndicator positionId={position.id} />
-              </Box>
-            </TableCell>
-            <TableCell align="right">
-              <Typography 
-                color={position.pnl >= 0 ? 'success.main' : 'error.main'}
-              >
-                {position.pnl > 0 ? '+' : ''}{position.pnl}$ ({position.pnlPercent}%)
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Typography variant="body2" color="text.secondary">
+                Entry: {trade.entryPrice}
               </Typography>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+              <Typography variant="body2" color="text.secondary">
+                Stop: {trade.stopLoss}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Target: {trade.targetPrice}
+              </Typography>
+            </Box>
+          </Box>
+        ))
+      )}
+    </Box>
   );
 };
 

@@ -10,7 +10,7 @@ export const LivePerformanceStats = () => {
 
   const stats = React.useMemo(() => {
     const activeTrades = trades.filter(t => t.status === 'OPEN');
-    const dailyPnL = activeTrades.reduce((sum, t) => sum + t.pnl, 0);
+    const dailyPnL = activeTrades.reduce((sum, t) => sum + (t.pnl || 0), 0);
     const winningTrades = activeTrades.filter(t => t.pnl > 0).length;
     const winRate = activeTrades.length > 0 ? (winningTrades / activeTrades.length) * 100 : 0;
 

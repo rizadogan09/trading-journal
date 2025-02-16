@@ -30,7 +30,7 @@ export const StrategySelector: React.FC<StrategySelectorProps> = ({ advantage })
     });
   };
 
-  const getStrategyColor = (min: number, max: number) => {
+  const getStrategyColor = (min: number = 0, max: number = 0) => {
     if (min >= 33 || max <= -33) return theme.palette.success.main;
     return theme.palette.warning.main;
   };

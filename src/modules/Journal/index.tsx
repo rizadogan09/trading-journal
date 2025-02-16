@@ -18,7 +18,7 @@ import {
   Stack
 } from '@mui/material';
 import { RootState } from '../../store';
-import type { Trade } from '../../store/journalSlice';
+import { Trade as JournalTrade } from '../../store/journalSlice';
 import { updateTrade } from '../../store/journalSlice';
 import TradeDialog from './components/TradeDialog';
 import { Edit as EditIcon } from '@mui/icons-material';
@@ -33,6 +33,7 @@ import { exportToExcel, exportToPdf } from '../../utils/exportHelpers';
 import { TradeHistory } from './components/TradeHistory';
 import { LivePerformanceStats } from './components/LivePerformanceStats';
 import TradingTimeAnalysis from './components/TradingTimeAnalysis';
+import { Position } from '../../types/position';
 
 // Status-Type erweitern
 type TradeStatus = 'OPEN' | 'CLOSED' | 'CANCELLED';
@@ -179,7 +180,7 @@ const Journal = () => {
     );
   });
 
-  const handleEditTrade = (trade: Position) => {
+  const handleEditTrade = (trade: JournalTrade) => {
     setSelectedTrade(trade);
   };
 

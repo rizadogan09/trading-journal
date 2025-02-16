@@ -22,6 +22,7 @@ export interface Trade {
   tradeNumber: number;
   exitPrice?: number;
   exitTime?: string;
+  entryTime: string;
 }
 
 interface JournalState {

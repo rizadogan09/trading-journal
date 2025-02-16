@@ -33,7 +33,8 @@ export const baseTheme = {
         root: {
           textTransform: 'none',
           fontWeight: 500,
-          fontSize: '0.875rem'
+          fontSize: '0.875rem',
+          variants: []
         },
         contained: {
           boxShadow: 'none',

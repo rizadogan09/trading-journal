@@ -38,7 +38,7 @@ const MarketAnalysis: React.FC = () => {
   const dispatch = useDispatch();
   const instruments = useSelector((state: RootState) => state.marketAnalysis.instruments);
   
-  const [selectedInstrument, setSelectedInstrument] = useState('');
+  const [selectedInstrument, setSelectedInstrument] = useState<string>(instruments[0]?.id || '');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [timeLevels, setTimeLevels] = useState({
     '4h': 'neutral',   // 4H zuerst
@@ -66,6 +66,13 @@ const MarketAnalysis: React.FC = () => {
 
   const handleInstrumentChange = (value: string) => {
     setSelectedInstrument(value);
+    dispatch(addAnalysis({
+      id: Date.now().toString(),
+      date: selectedDate,
+      instrumentId: value,
+      timeLevels,
+      advantage
+    }));
   };
 
   const handleTimeFrameChange = (timeLevel: string, value: string) => {
@@ -76,15 +83,13 @@ const MarketAnalysis: React.FC = () => {
   };
 
   const handleSaveAnalysis = () => {
-    if (selectedInstrument) {
-      dispatch(addAnalysis({
-        id: Date.now().toString(),
-        date: selectedDate,
-        instrumentId: selectedInstrument,
-        timeLevels: timeLevels,
-        advantage
-      }));
-    }
+    dispatch(addAnalysis({
+      id: Date.now().toString(),
+      date: selectedDate,
+      instrumentId: selectedInstrument,
+      timeLevels,
+      advantage
+    }));
   };
 
   return (
@@ -94,116 +99,81 @@ const MarketAnalysis: React.FC = () => {
       </Typography>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Paper sx={{ p: 2, minHeight: 500 }}>
-            <TradingViewWidget />
+          <Paper sx={{ p: 2 }}>
+            <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+              <FormControl fullWidth>
+                <InputLabel>Instrument</InputLabel>
+                <Select
+                  value={selectedInstrument}
+                  label="Instrument"
+                  onChange={(e) => handleInstrumentChange(e.target.value)}
+                >
+                  {instruments.map((instrument) => (
+                    <MenuItem key={instrument.id} value={instrument.id}>
+                      {instrument.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <TextField
+                type="date"
+                label="Datum"
+                value={selectedDate.toISOString().split('T')[0]}
+                onChange={(e) => setSelectedDate(new Date(e.target.value))}
+                sx={{ width: 200 }}
+              />
+            </Stack>
+            <TradingViewWidget symbol={selectedInstrument} />
           </Paper>
         </Grid>
-        <Grid item xs={12} md={6}>
+
+        <Grid item xs={12} md={8}>
+          <Paper sx={{ p: 2 }}>
+            <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+              {Object.keys(timeLevels).map((timeLevel) => (
+                <FormControl key={timeLevel} fullWidth>
+                  <InputLabel>{timeLevel}</InputLabel>
+                  <Select
+                    value={timeLevels[timeLevel]}
+                    label={timeLevel}
+                    onChange={(e) => handleTimeFrameChange(timeLevel, e.target.value)}
+                  >
+                    <MenuItem value="↑">↑ Strong Up</MenuItem>
+                    <MenuItem value="↗">↗ Slight Up</MenuItem>
+                    <MenuItem value="→">→ Neutral</MenuItem>
+                    <MenuItem value="↘">↘ Slight Down</MenuItem>
+                    <MenuItem value="↓">↓ Strong Down</MenuItem>
+                  </Select>
+                </FormControl>
+              ))}
+              <Button 
+                variant="contained" 
+                onClick={handleSaveAnalysis}
+                sx={{ height: 56 }}
+              >
+                Analyse speichern
+              </Button>
+            </Stack>
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h6" gutterBottom>
+                Marktvorteil
+              </Typography>
+              <AdvantageMeter advantage={advantage} />
+            </Box>
+          </Paper>
+        </Grid>
+
+        <Grid item xs={12} md={4}>
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
-              Marktanalyse Eingabe
+              Strategien
             </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel>Instrument</InputLabel>
-                  <Select
-                    value={selectedInstrument || ''}
-                    onChange={(e) => handleInstrumentChange(e.target.value)}
-                  >
-                    {instruments.map((inst) => (
-                      <MenuItem key={inst.id} value={inst.id}>
-                        {inst.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel>4H</InputLabel>
-                  <Select
-                    value={timeLevels['4h']}
-                    onChange={(e) => handleTimeFrameChange('4h', e.target.value)}
-                  >
-                    <MenuItem value="↑">↑</MenuItem>
-                    <MenuItem value="↗">↗</MenuItem>
-                    <MenuItem value="→">→</MenuItem>
-                    <MenuItem value="↘">↘</MenuItem>
-                    <MenuItem value="↓">↓</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel>1H</InputLabel>
-                  <Select
-                    value={timeLevels['1h']}
-                    onChange={(e) => handleTimeFrameChange('1h', e.target.value)}
-                  >
-                    <MenuItem value="↑">↑</MenuItem>
-                    <MenuItem value="↗">↗</MenuItem>
-                    <MenuItem value="→">→</MenuItem>
-                    <MenuItem value="↘">↘</MenuItem>
-                    <MenuItem value="↓">↓</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel>15M</InputLabel>
-                  <Select
-                    value={timeLevels['15m']}
-                    onChange={(e) => handleTimeFrameChange('15m', e.target.value)}
-                  >
-                    <MenuItem value="↑">↑</MenuItem>
-                    <MenuItem value="↗">↗</MenuItem>
-                    <MenuItem value="→">→</MenuItem>
-                    <MenuItem value="↘">↘</MenuItem>
-                    <MenuItem value="↓">↓</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12}>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  onClick={handleSaveAnalysis}
-                  disabled={!selectedInstrument}
-                >
-                  Analyse speichern
-                </Button>
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3 }}>
-            <Grid container spacing={4}>
-              <Grid item xs={12} md={8}>
-                <Stack spacing={3}>
-                  <Typography variant="h6" gutterBottom>
-                    Marktvorteil
-                  </Typography>
-                  
-                  <Box sx={{ mb: 4 }}>
-                    <AdvantageMeter advantage={advantage} />
-                  </Box>
-
-                  <StrategySelector advantage={advantage} />
-                </Stack>
-              </Grid>
-            </Grid>
+            <StrategySelector advantage={advantage} />
           </Paper>
         </Grid>
 
         <Grid item xs={12}>
-          <Paper sx={{ p: 2, minHeight: 400 }}>
+          <Paper sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
               Wirtschaftskalender
             </Typography>

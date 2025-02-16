@@ -16,6 +16,8 @@ export interface Trade {
   tags: string[];
   pnl?: number;
   strategy?: string;
-  tradeNumber?: number;
+  tradeNumber: number;
   exitPrice?: number;
+  entryTime: string;
+  exitTime?: string;
 } 

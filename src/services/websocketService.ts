@@ -5,7 +5,7 @@ import { updatePosition } from '../store/journalSlice';
 
 type WebSocketCallback = (data: any) => void;
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8080';
+const WS_URL = process.env.VITE_WS_URL || 'ws://localhost:5174';
 
 class WebSocketService {
   private socket: WebSocket | null = null;
@@ -20,9 +20,9 @@ class WebSocketService {
 
   connect() {
     try {
-      if (import.meta.env.DEV) {
+      if (process.env.DEV) {
         // Im Development-Modus Mock-Server verwenden
-        this.socket = new WebSocket('ws://localhost:8080');
+        this.socket = new WebSocket('ws://localhost:5174');
         mockServer.addClient(this.socket as WebSocket);
       } else {
         // Im Production-Modus echte WebSocket-URL verwenden

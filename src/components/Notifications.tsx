@@ -12,23 +12,23 @@ export const Notifications = () => {
     dispatch(clearNotification());
   };
 
+  if (!notification) return null;  // Early return wenn keine Notification
+
   return (
     <Box>
       <Snackbar
-        open={!!notification}
+        open={true}
         autoHideDuration={6000}
         onClose={handleClose}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        {notification && (
-          <Alert
-            onClose={handleClose}
-            severity={notification.type}
-            variant="filled"
-          >
-            {notification.message}
-          </Alert>
-        )}
+        <Alert
+          onClose={handleClose}
+          severity={notification.type}
+          variant="filled"
+        >
+          {notification.message}
+        </Alert>
       </Snackbar>
     </Box>
   );

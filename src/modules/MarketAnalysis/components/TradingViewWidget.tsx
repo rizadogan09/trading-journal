@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../store';
+import { Box, useTheme, useMediaQuery } from '@mui/material';
 
 declare global {
   interface Window {
@@ -14,6 +13,8 @@ interface TradingViewWidgetProps {
 
 export const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({ symbol }) => {
   const container = useRef<HTMLDivElement>(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -31,21 +32,42 @@ export const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({ symbol }) 
           locale: 'de_DE',
           toolbar_bg: '#f1f3f6',
           enable_publishing: false,
-          hide_side_toolbar: false,
+          hide_side_toolbar: isMobile,
+          hide_volume: isMobile,
           allow_symbol_change: true,
           save_image: false,
-          height: 600
+          height: isMobile ? 400 : 600,
+          width: '100%',
+          studies: ['RSI@tv-basicstudies'],
+          disabled_features: [
+            'use_localstorage_for_settings',
+            isMobile && 'left_toolbar',
+            isMobile && 'volume_force_overlay'
+          ].filter(Boolean)
         });
       }
     };
     document.head.appendChild(script);
 
     return () => {
-      document.head.removeChild(script);
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
     };
-  }, [symbol]);
+  }, [symbol, isMobile]);
 
-  return <div id="tradingview_widget" ref={container} style={{ height: '600px' }} />;
+  return (
+    <Box 
+      sx={{ 
+        width: '100%',
+        height: isMobile ? '400px' : '600px',
+        overflow: 'hidden',
+        borderRadius: 1
+      }}
+    >
+      <div id="tradingview_widget" ref={container} style={{ height: '100%', width: '100%' }} />
+    </Box>
+  );
 };
 
 export default TradingViewWidget; 

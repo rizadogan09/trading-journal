@@ -26,7 +26,8 @@ import {
   Dashboard,
   Science,
   DarkMode,
-  LightMode
+  LightMode,
+  Psychology as PsychologyIcon
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { WebSocketStatus } from '../WebSocketStatus';
@@ -67,6 +68,11 @@ const Navigation = () => {
     { text: 'Instrumente', icon: <Token />, path: '/instruments' },
     { text: 'Einstellungen', icon: <Settings />, path: '/settings' },
     { text: 'Backtesting', icon: <Science />, path: '/backtesting' },
+    {
+      text: 'Trading Psychologie',
+      icon: <PsychologyIcon />,
+      path: '/psychology'
+    },
   ];
 
   const drawer = (

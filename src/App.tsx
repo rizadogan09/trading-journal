@@ -19,6 +19,7 @@ import './styles/animations.css';  // CSS für Animationen
 import { Notifications } from './components/Notifications';
 import Backtesting from './modules/Backtesting';
 import { CustomThemeProvider } from './theme/ThemeProvider';
+import Psychology from './modules/Psychology/Psychology';
 
 declare global {
   interface Window {
@@ -56,6 +57,7 @@ function App() {
                     <Route path="/instruments" element={<Instruments />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/backtesting" element={<Backtesting />} />
+                    <Route path="/psychology" element={<Psychology />} />
                   </Routes>
                 </Box>
               </Box>

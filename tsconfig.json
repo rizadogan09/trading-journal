@@ -29,9 +29,14 @@
     "noImplicitThis": true,
     "alwaysStrict": true,
 
+    "types": [
+      "node",
+      "react",
+      "react-dom"
+    ],
+
     "typeRoots": [
-      "./node_modules/@types",
-      "./src/types"
+      "./node_modules/@types"
     ]
   },
   "include": ["src"],

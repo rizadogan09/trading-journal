@@ -31,22 +31,36 @@ interface JournalState {
   tags: string[];
 }
 
-const initialState: JournalState = {
-  trades: [],
-  lastTradeNumber: 0,
-  tags: [
-    'FOMO', 
-    'Überhandelt', 
-    'Stop zu eng', 
-    'Stop zu weit',
-    'Zu früh raus',
-    'Zu spät raus',
-    'Position zu groß',
-    'Position zu klein',
-    'Ohne Setup',
-    'Gegen Trend'
-  ]
+// Lade initiale Daten aus localStorage
+const loadState = () => {
+  try {
+    const serializedState = localStorage.getItem('journalState');
+    if (serializedState === null) {
+      return {
+        trades: [],
+        lastTradeNumber: 0,
+        tags: [
+          'FOMO', 
+          'Überhandelt', 
+          'Stop zu eng', 
+          'Stop zu weit',
+          'Zu früh raus',
+          'Zu spät raus',
+          'Position zu groß',
+          'Position zu klein',
+          'Ohne Setup',
+          'Gegen Trend'
+        ]
+      };
+    }
+    return JSON.parse(serializedState);
+  } catch (err) {
+    console.error('Error loading state:', err);
+    return undefined;
+  }
 };
+
+const initialState = loadState();
 
 const journalSlice = createSlice({
   name: 'journal',
@@ -59,6 +73,8 @@ const journalSlice = createSlice({
         tradeNumber: state.lastTradeNumber,
         tags: []
       });
+      // Speichere nach jedem Trade
+      saveState(state);
     },
     updateTrade(state, action: PayloadAction<Partial<Trade> & { id: string }>) {
       const index = state.trades.findIndex(t => t.id === action.payload.id);
@@ -73,13 +89,9 @@ const journalSlice = createSlice({
             const instrument = instrumentsData.instruments.find(i => i.id === trade.instrumentId);
             if (!instrument) return;
 
-            // Berechnung der Ticks
             const tickDiff = Math.abs(exitPrice - entryPrice) / instrument.tickSize;
-            
-            // P/L pro Tick
             const valuePerTick = instrument.tickValue;
             
-            // Gesamter P/L
             const pnl = trade.direction === 'LONG'
               ? (exitPrice - entryPrice) / instrument.tickSize * valuePerTick * trade.size
               : (entryPrice - exitPrice) / instrument.tickSize * valuePerTick * trade.size;
@@ -98,10 +110,14 @@ const journalSlice = createSlice({
         } else {
           state.trades[index] = { ...trade, ...action.payload };
         }
+        // Speichere nach jedem Update
+        saveState(state);
       }
     },
     deleteTrade(state, action: PayloadAction<string>) {
       state.trades = state.trades.filter(t => t.id !== action.payload);
+      // Speichere nach jedem Löschen
+      saveState(state);
     },
     updatePosition(state, action: PayloadAction<any>) {
       const { id, pnl, status, exitPrice } = action.payload;
@@ -113,10 +129,22 @@ const journalSlice = createSlice({
           status,
           exitPrice
         };
+        // Speichere nach jedem Position Update
+        saveState(state);
       }
     }
   }
 });
+
+// Helper Funktion zum Speichern des States
+const saveState = (state: any) => {
+  try {
+    const serializedState = JSON.stringify(state);
+    localStorage.setItem('journalState', serializedState);
+  } catch (err) {
+    console.error('Error saving state:', err);
+  }
+};
 
 export const { addTrade, updateTrade, deleteTrade, updatePosition } = journalSlice.actions;
 export default journalSlice.reducer; 

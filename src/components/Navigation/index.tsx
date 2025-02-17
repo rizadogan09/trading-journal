@@ -81,7 +81,7 @@ const Navigation = () => {
           <>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <img 
-                src="https://trading-journal-six.vercel.app/logo.png"
+                src="/assets/logo.png"
                 alt="Tracevizion Logo" 
                 style={{ 
                   height: '40px', 
@@ -90,7 +90,8 @@ const Navigation = () => {
                 }} 
                 onError={(e) => {
                   console.error('Logo loading error:', e);
-                  e.currentTarget.style.display = 'none';
+                  const imgElement = e.currentTarget as HTMLImageElement;
+                  console.log('Failed URL:', imgElement.src);
                 }}
               />
               {!isMobile && (
@@ -102,7 +103,7 @@ const Navigation = () => {
           </>
         ) : (
           <img 
-            src="https://trading-journal-six.vercel.app/symbol.png"
+            src="/assets/symbol.png"
             alt="Tracevizion" 
             style={{ 
               height: 32,
@@ -112,7 +113,8 @@ const Navigation = () => {
             }}
             onError={(e) => {
               console.error('Symbol loading error:', e);
-              e.currentTarget.style.display = 'none';
+              const imgElement = e.currentTarget as HTMLImageElement;
+              console.log('Failed URL:', imgElement.src);
             }}
           />
         )}
